@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSocket } from '../providers/Socket'
 import { useNavigate } from 'react-router-dom';
 
@@ -15,13 +15,17 @@ export const Home = () => {
     socket.emit('join-room', { roomId: roomid, emailId: emailid})
   }
 
-  const handleRoomJoined = ({ roomId }) => {
+  const handleRoomJoined = useCallback(({ roomId }) => {
     console.log(roomId);
     navigate(`/room/${roomId}`)
-  }
+  })
 
   useEffect(() => {
     socket.on("joined-room", handleRoomJoined);
+
+    return () => {
+      socket.off("joined-room", handleRoomJoined);
+    }
   }, [socket]);
 
   return (
